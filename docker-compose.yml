@@ -1,15 +1,13 @@
-version: '2'
-
+version: "3"
 services:
-
     snappass:
-        build: .
-        image: pinterest/snappass
+        image: snappass
         ports:
             - "5000:5000"
         stop_signal: SIGINT
         environment:
             - REDIS_HOST=redis
+            - REDIS_PORT=6379
             - NO_SSL=True
         depends_on:
           - redis

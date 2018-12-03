@@ -1,4 +1,11 @@
+FROM debian:stretch-slim as base
+
+# netcat is required for the wait-for script
+RUN apt-get update && apt-get install -y --no-install-recommends netcat && rm -rf /var/lib/apt/lists/*
+
 FROM python:3.7-slim
+
+COPY --from=base /bin/nc /bin/nc
 
 ENV APP_DIR=/usr/src/snappass
 
@@ -8,7 +15,7 @@ RUN groupadd -r snappass && \
 
 WORKDIR $APP_DIR
 
-COPY ["setup.py", "MANIFEST.in", "README.rst", "AUTHORS.rst", "$APP_DIR/"]
+COPY ["wait-for", "entrypoint.sh", "setup.py", "MANIFEST.in", "README.rst", "AUTHORS.rst", "$APP_DIR/"]
 COPY ["./snappass", "$APP_DIR/snappass"]
 
 RUN python setup.py install && \
@@ -20,4 +27,4 @@ USER snappass
 # Default Flask port
 EXPOSE 5000
 
-CMD ["snappass"]
+ENTRYPOINT ["./entrypoint.sh"]
